@@ -9,6 +9,11 @@ Simulates combat between parties and their encounters, with the 5th edition rule
 - Area of Effect is single target
 - Proficiency in saving throws is not implemented (what I did is increase the stat modifier by whatever the save prof would be. so a +4 would increase the stat with 8, etc.)
 
+# How to run
+You will need python 3.7, and just run the main.py file.
+Changing the settings can be done in the config.py file.
+Your "players" need to be in a file called players.json in /simulationfiles
+Your "enemeies" need to be in a file called enemies.json in /simulationfiles
 
 # ToDo in order of randomization
 - [ ] Actually use iniative
