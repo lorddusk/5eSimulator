@@ -26,3 +26,6 @@ Your "enemeies" need to be in a file called enemies.json in /simulationfiles
 - [ ] Save Profiency support
 - [ ] Implement racial abilities
 - [ ] Implement class abilities
+- [ ] Support for healing spells
+- [ ] Support for buff spells
+- [ ] Support for not-buff spells (Fear for example)
