@@ -12,8 +12,11 @@ Simulates combat between parties and their encounters, with the 5th edition rule
 
 # How to run
 You will need python 3.7, and just run the main.py file.
+
 Changing the settings can be done in the config.py file.
+
 Your "players" need to be in a file called players.json in /simulationfiles
+
 Your "enemeies" need to be in a file called enemies.json in /simulationfiles
 
 # ToDo in order of randomization
