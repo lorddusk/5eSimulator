@@ -3,6 +3,7 @@ Simulates combat between parties and their encounters, with the 5th edition rule
 
 # Current Status
 - The "AI" is incredibly stupid, it randomly selects a target, without checking for range or current health.
+- The "AI" also selects a random attack out of their arsenal.
 - Spells/attacks with saving throws are always "Save or Suck".
 - Iniative is rolled, but not used.
 - Attacks are always within range. (5ft for melee, 10ft for ranged)
@@ -17,7 +18,11 @@ Your "enemeies" need to be in a file called enemies.json in /simulationfiles
 
 # ToDo in order of randomization
 - [ ] Actually use iniative
+- [ ] Weight system for attacks
+- [ ] Recharge system for Rechargable effects
 - [ ] "Smart" selecting of targets
 - [ ] Implement "Save and Half" damage for spells/attacks with saving throws
 - [ ] Make AoE multi target
 - [ ] Save Profiency support
+- [ ] Implement racial abilities
+- [ ] Implement class abilities
