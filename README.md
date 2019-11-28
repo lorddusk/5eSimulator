@@ -11,8 +11,8 @@ Simulates combat between parties and their encounters, with the 5th edition rule
 
 
 # ToDo in order of randomization
-[ ] Actually use iniative
-[ ] "Smart" selecting of targets
-[ ] Implement "Save and Half" damage for spells/attacks with saving throws
-[ ] Make AoE multi target
-[ ] Save Profiency support
+- [ ] Actually use iniative
+- [ ] "Smart" selecting of targets
+- [ ] Implement "Save and Half" damage for spells/attacks with saving throws
+- [ ] Make AoE multi target
+- [ ] Save Profiency support
