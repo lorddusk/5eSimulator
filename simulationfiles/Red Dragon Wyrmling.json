@@ -1,0 +1,29 @@
+[
+	{
+		"name": "Red Dragon Wyrmling",
+		"str": 19,
+		"dex": 14,
+		"con": 17,
+		"int": 12,
+		"wis": 11,
+		"cha": 15,
+		"hp": 75,
+		"ac": 17,
+		"prof": 2,
+		"noa": 1,
+		"attacks": [
+			{
+				"name": "Bite",
+				"hit": 6,
+				"damage": "1d10+4+1d6"
+			},
+			{
+				"name": "Fire Breath",
+				"dc": 13,
+				"save" : "dex",
+				"damage": "7d6"
+			}
+		],
+		"type": "e"
+	}
+]

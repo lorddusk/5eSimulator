@@ -1,0 +1,106 @@
+[
+	{
+		"name": "Kobold",
+		"str": 7,
+		"dex": 15,
+		"con": 9,
+		"int": 8,
+		"wis": 7,
+		"cha": 8,
+		"hp": 5,
+		"ac": 12,
+		"prof": 2,
+		"noa": 1,
+		"attacks": [
+			{
+				"name": "Dagger",
+				"hit": 4,
+				"damage": "1d4+2"
+			},
+			{
+				"name": "Sling",
+				"hit": 4,
+				"damage": "1d4+2"
+			}
+		],
+		"type": "e"
+	},
+	{
+		"name": "Goblin",
+		"str": 8,
+		"dex": 14,
+		"con": 10,
+		"int": 10,
+		"wis": 8,
+		"cha": 8,
+		"hp": 7,
+		"ac": 15,
+		"prof": 2,
+		"noa": 1,
+		"attacks": [
+			{
+				"name": "Scimitar",
+				"hit": 4,
+				"damage": "1d6+2"
+			},
+			{
+				"name": "Shortbow",
+				"hit": 4,
+				"damage": "1d6+2"
+			}
+		],
+		"type": "e"
+	},
+	{
+		"name": "Cultist",
+		"str": 11,
+		"dex": 12,
+		"con": 10,
+		"int": 10,
+		"wis": 11,
+		"cha": 10,
+		"hp": 9,
+		"ac": 12,
+		"prof": 2,
+		"noa": 1,
+		"attacks": [
+			{
+				"name": "Scimitar",
+				"hit": 3,
+				"damage": "1d6+1"
+			}
+		],
+		"type": "e"
+	},
+	{
+		"name": "Gnoll",
+		"str": 14,
+		"dex": 12,
+		"con": 11,
+		"int": 6,
+		"wis": 10,
+		"cha": 7,
+		"hp": 22,
+		"ac": 15,
+		"prof": 2,
+		"noa": 1,
+		"attacks": [
+			{
+				"name": "Bite",
+				"hit": 4,
+				"damage": "1d4+2"
+			},
+			{
+				"name": "Spear",
+				"hit": 4,
+				"damage": "1d6+2"
+			},
+			{
+				"name": "Longbow",
+				"hit": 3,
+				"damage": "1d8+1"
+			}
+		],
+		"type": "e"
+	}
+]

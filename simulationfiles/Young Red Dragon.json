@@ -1,0 +1,28 @@
+[
+	{
+		"name": "Young Red dragon",
+		"str": 23,
+		"dex": 18,
+		"con": 21,
+		"int": 14,
+		"wis": 11,
+		"cha": 19,
+		"hp": 178,
+		"ac": 18,
+		"prof": 4,
+		"noa": 3,
+		"attacks": [
+			{
+				"name": "Bite",
+				"hit": 10,
+				"damage": "2d10+6+1d6"
+			},
+			{
+				"name": "Claw",
+				"hit": 10,
+				"damage": "2d6+6"
+			}
+		],
+		"type": "e"
+	}
+]
