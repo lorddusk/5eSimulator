@@ -4,7 +4,7 @@ log = logging.getLogger(__name__)
 from utils.functions import AbilityScores, Attacks, SimStats
 
 class Player:
-    def __init__(self, name: str, ac: int, hp: int, ability_scores: AbilityScores, type: str, prof: int, noa: int, attacks: Attacks, simStats: SimStats):
+    def __init__(self, name: str, ac: int, hp: int, ability_scores: AbilityScores, type: str, prof: int, noa: int, attacks: Attacks, simStats: SimStats, saves):
         self.name = name
         self.hp = hp
         self.ac = ac
@@ -19,6 +19,7 @@ class Player:
         self.attacks = attacks
         self.type = type
         self.simStats = simStats
+        self.saves = saves
         self.initiative = 0
 
     @classmethod
@@ -40,8 +41,14 @@ class Player:
                                    data['wis'] or 10, data['cha'] or 10)
         except Exception as e:
             log.error(e)
+        saves = []
+        for save in data['saves']:
+            try:
+                saves.append(save)
+            except Exception as e:
+                log.error(e)
 
-        return cls(data['name'], ac, hp, scores, type, prof, noa, attacks, SimStats())
+        return cls(data['name'], ac, hp, scores, type, prof, noa, attacks, SimStats(), saves)
 
     def get_stat_array(self):
         """

@@ -26,7 +26,7 @@ Your "enemeies" need to be in a file called enemies.json in /simulationfiles
 - [ ] "Smart" selecting of targets
 - [ ] Implement "Save and Half" damage for spells/attacks with saving throws
 - [ ] Make AoE multi target
-- [ ] Save Profiency support
+- [x] Save Proficiency support
 - [ ] Implement racial abilities
 - [ ] Implement class abilities
 - [ ] Support for healing spells

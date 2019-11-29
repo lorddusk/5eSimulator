@@ -65,33 +65,19 @@ def combat(enemyList, playerList):
                 if attack.hit is not 0:
                     atk = roll(f"1d20+{attack.hit}")
                     if atk.plain >= enemy.ac:
-                        x.simStats.attacksHit += 1
-                        enemy.simStats.defendsFailed += 1
-                        damage = roll(attack.damage)
-                        enemy.hp = enemy.hp - damage.plain
-                        x.simStats.damageDealt += damage.plain
-                        enemy.simStats.damageTaken += damage.plain
-                        debug(f"\t\tHit! (did {damage.plain} damage)")
-                        debug(f"\t\t{enemy.name} has {enemy.hp} HP left.")
+                        attackHit(atk, attack, enemy, x)
                     else:
-                        x.simStats.attacksMiss += 1
-                        enemy.simStats.defendsSuccess += 1
-                        debug("\t\tMiss!")
+                        attackMiss(atk, enemy, x)
                 else:
-                    save = roll(f"1d20+{enemy.get_mod('dexterityMod')}")
-                    if save.plain >= attack.dc:
-                        x.simStats.attacksHit += 1
-                        enemy.simStats.defendsFailed += 1
-                        damage = roll(attack.damage)
-                        enemy.hp = enemy.hp - damage.plain
-                        x.simStats.damageDealt += damage.plain
-                        enemy.simStats.damageTaken += damage.plain
-                        debug(f"\t\tFailed Saving Throw! (did {damage.plain} damage)")
-                        debug(f"\t\t{enemy.name} has {enemy.hp} HP left.")
+                    if attack.save in enemy.saves:
+                        mod = enemy.get_mod(attack.save) + enemy.prof
                     else:
-                        x.simStats.attacksMiss += 1
-                        enemy.simStats.defendsSuccess += 1
-                        debug("\t\tSaved Saving Throw!")
+                        mod = enemy.get_mod(attack.save)
+                    save = roll(f"1d20+{mod}")
+                    if save.plain < attack.dc:
+                        saveFailure(save, attack, enemy, x)
+                    else:
+                        saveSuccess(attack, enemy, save, x)
                 if enemy.hp <= 0:
                     debug(f"\t\t\t{enemy.name} died!")
                     if enemy.type == "p":
@@ -119,6 +105,44 @@ def combat(enemyList, playerList):
         debug("Players Won!")
         FightStats(everyone)
         return 0
+
+
+def saveSuccess(attack, enemy, save, x):
+    x.simStats.attacksMiss += 1
+    enemy.simStats.defendsSuccess += 1
+    debug(f"\t\tRolled a {save.plain}, DC is {attack.dc}")
+    debug("\t\t\tSucceeded Saving Throw!")
+
+
+def attackMiss(atk, enemy, x):
+    x.simStats.attacksMiss += 1
+    enemy.simStats.defendsSuccess += 1
+    debug(f"\t\tRolled a {atk.plain}, AC is {enemy.ac}")
+    debug("\t\t\tMiss!")
+
+
+def saveFailure(save, attack, enemy, x):
+    x.simStats.attacksHit += 1
+    enemy.simStats.defendsFailed += 1
+    damage = roll(attack.damage)
+    enemy.hp = enemy.hp - damage.plain
+    x.simStats.damageDealt += damage.plain
+    enemy.simStats.damageTaken += damage.plain
+    debug(f"\t\tRolled a {save.plain}, DC is {attack.dc}")
+    debug(f"\t\t\tFailed Saving Throw! (did {damage.plain} damage)")
+    debug(f"\t\t\t{enemy.name} has {enemy.hp} HP left.")
+
+
+def attackHit(atk, attack, enemy, x):
+    x.simStats.attacksHit += 1
+    enemy.simStats.defendsFailed += 1
+    damage = roll(attack.damage)
+    enemy.hp = enemy.hp - damage.plain
+    x.simStats.damageDealt += damage.plain
+    enemy.simStats.damageTaken += damage.plain
+    debug(f"\t\tRolled a {atk.plain}, AC is {enemy.ac}")
+    debug(f"\t\t\tHit! (did {damage.plain} damage)")
+    debug(f"\t\t\t{enemy.name} has {enemy.hp} HP left.")
 
 
 def FightStats(everyone):
