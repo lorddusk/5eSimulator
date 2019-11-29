@@ -19,6 +19,7 @@ class Player:
         self.attacks = attacks
         self.type = type
         self.simStats = simStats
+        self.initiative = 0
 
     @classmethod
     def from_data(cls, data):

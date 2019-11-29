@@ -17,28 +17,32 @@ def importPlayers():
 
 
 def rollInitiative(enemyList, playerList):
-    tempList = dict()
     for x in playerList:
         init = roll(f"1d20+{x.get_mod('dexterityMod')}")
-        tempList[x.name] = init.plain
+        x.initiative = init.plain
     for x in enemyList:
         init = roll(f"1d20+{x.get_mod('dexterityMod')}")
-        tempList[x.name] = init.plain
-    return collections.OrderedDict(sorted(tempList.items(), key=lambda kv: kv[1]))
+        x.initiative = init.plain
 
-def debug(text, printing):
+def debug(text):
     if printing:
         print(text)
 
-def combat(enemyList, playerList, initiativeList, printing):
+def line():
+    print("---------------------------")
+
+def combat(enemyList, playerList):
+    debug("Rolling Initiative...")
+    rollInitiative(enemyList, playerList)
     enemiesAlive = len(enemyList)
     playersAlive = len(playerList)
     contenders = playerList + enemyList
+    contenders.sort(key=lambda i: i.initiative, reverse=True)
     everyone = playerList + enemyList
     i = 1
     fight = True
     while fight:
-        debug(f"Round {i} ({len(contenders)} contenders left):", printing)
+        debug(f"Round {i} ({len(contenders)} contenders left):")
         for x in contenders:
             for attacks in range(x.noa):
                 x.simStats.attacks += 1
@@ -57,7 +61,7 @@ def combat(enemyList, playerList, initiativeList, printing):
                         fight = False
                         continue
                 attack = random.choice(x.attacks)
-                debug(f"\t{x.name} attacking: {enemy.name} with {attack.name}", printing)
+                debug(f"\t{x.name} attacking: {enemy.name} with {attack.name}")
                 if attack.hit is not 0:
                     atk = roll(f"1d20+{attack.hit}")
                     if atk.plain >= enemy.ac:
@@ -67,12 +71,12 @@ def combat(enemyList, playerList, initiativeList, printing):
                         enemy.hp = enemy.hp - damage.plain
                         x.simStats.damageDealt += damage.plain
                         enemy.simStats.damageTaken += damage.plain
-                        debug(f"\t\tHit! (did {damage.plain} damage)", printing)
-                        debug(f"\t\t{enemy.name} has {enemy.hp} HP left.", printing)
+                        debug(f"\t\tHit! (did {damage.plain} damage)")
+                        debug(f"\t\t{enemy.name} has {enemy.hp} HP left.")
                     else:
                         x.simStats.attacksMiss += 1
                         enemy.simStats.defendsSuccess += 1
-                        debug("\t\tMiss!", printing)
+                        debug("\t\tMiss!")
                 else:
                     save = roll(f"1d20+{enemy.get_mod('dexterityMod')}")
                     if save.plain >= attack.dc:
@@ -82,14 +86,14 @@ def combat(enemyList, playerList, initiativeList, printing):
                         enemy.hp = enemy.hp - damage.plain
                         x.simStats.damageDealt += damage.plain
                         enemy.simStats.damageTaken += damage.plain
-                        debug(f"\t\tFailed Saving Throw! (did {damage.plain} damage)" , printing)
-                        debug(f"\t\t{enemy.name} has {enemy.hp} HP left.", printing)
+                        debug(f"\t\tFailed Saving Throw! (did {damage.plain} damage)")
+                        debug(f"\t\t{enemy.name} has {enemy.hp} HP left.")
                     else:
                         x.simStats.attacksMiss += 1
                         enemy.simStats.defendsSuccess += 1
-                        debug("\t\tSaved Saving Throw!", printing)
+                        debug("\t\tSaved Saving Throw!")
                 if enemy.hp <= 0:
-                    debug(f"\t\t\t{enemy.name} died!", printing)
+                    debug(f"\t\t\t{enemy.name} died!")
                     if enemy.type == "p":
                         playerList.remove(enemy)
                         contenders.remove(enemy)
@@ -104,26 +108,26 @@ def combat(enemyList, playerList, initiativeList, printing):
                         if enemiesAlive == 0:
                             fight = False
                             continue
-        debug("---------------------------", printing)
+        debug("---------------------------")
         i = i + 1
-    debug("---------------------------", printing)
+    debug("---------------------------")
     if playersAlive == 0:
-        debug("Enemies Won!", printing)
-        FightStats(everyone, printing)
+        debug("Enemies Won!")
+        FightStats(everyone)
         return 1
     if enemiesAlive == 0:
-        debug("Players Won!", printing)
-        FightStats(everyone, printing)
+        debug("Players Won!")
+        FightStats(everyone)
         return 0
 
 
-def FightStats(everyone, printing):
-    debug("---------------------------", printing)
-    debug(f"----Overall Statistics----", printing)
+def FightStats(everyone):
+    debug("---------------------------")
+    debug(f"----Overall Statistics----")
     for y in everyone:
-        debug(y.name, printing)
-        debug(y.simStats.get_stats(), printing)
-        debug("---------------------------", printing)
+        debug(y.name)
+        debug(y.simStats.get_stats())
+        debug("---------------------------")
 
 
 def run():
@@ -133,24 +137,24 @@ def run():
     enemySim = 0
     print(f"Simulating {amount} fights...")
     for i in range(1, (amount + 1)):
-        debug(f"Simulation {i} out of {amount}", printing)
+        debug(f"Simulation {i} out of {amount}")
         enemies = importEnemies()
         players = importPlayers()
-        initiatives = rollInitiative(enemies, players)
-        win = combat(enemies, players, initiatives, printing)
+        win = combat(enemies, players)
         if win == 0:
             playerWins += 1
             playerSim += 1
         elif win == 1:
             enemyWins += 1
             enemySim += 1
-        debug("-------------------------", printing)
-        if i % reports == 0:
-            print(f"Progress after {reports} fights (total {i}):")
-            print(f"\tPlayers won {playerSim} times")
-            print(f"\tEnemies won {enemySim} times\n")
-            playerSim = 0
-            enemySim = 0
+        debug("-------------------------")
+        if reports != 0:
+            if i % reports == 0:
+                print(f"Progress after {reports} fights (total {i}):")
+                print(f"\tPlayers won {playerSim} times")
+                print(f"\tEnemies won {enemySim} times\n")
+                playerSim = 0
+                enemySim = 0
     print(f"End result after {amount} fights:")
     print(f"\tPlayers won {playerWins} out of {amount} times")
     print(f"\tEnemies won {enemyWins} out of {amount} times")
