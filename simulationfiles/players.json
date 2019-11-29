@@ -85,6 +85,7 @@
         "name": "Sacred Flame",
         "dc": 13,
         "save": "dex",
+        "half": true,
         "damage": "1d8"
       }
     ],

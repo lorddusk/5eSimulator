@@ -19,6 +19,7 @@ class Attacks:
         self.hit = data.get('hit',0)
         self.dc = data.get('dc',0)
         self.save = data.get('save','')
+        self.half = data.get('half', False)
         self.damage = data['damage']
 
 class SimStats:

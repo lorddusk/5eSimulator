@@ -24,7 +24,7 @@ Your "enemeies" need to be in a file called enemies.json in /simulationfiles
 - [ ] Weight system for attacks
 - [ ] Recharge system for Rechargable effects
 - [ ] "Smart" selecting of targets
-- [ ] Implement "Save and Half" damage for spells/attacks with saving throws
+- [x] Implement "Save and Half" damage for spells/attacks with saving throws
 - [ ] Make AoE multi target
 - [x] Save Proficiency support
 - [ ] Implement racial abilities

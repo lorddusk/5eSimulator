@@ -1,5 +1,7 @@
 import json
 
+import math
+
 import config
 from utils.dice import roll
 from models.player import Player
@@ -77,7 +79,10 @@ def combat(enemyList, playerList):
                     if save.plain < attack.dc:
                         saveFailure(save, attack, enemy, x)
                     else:
-                        saveSuccess(attack, enemy, save, x)
+                        if attack.half:
+                            saveFailure(save, attack, enemy, x)
+                        else:
+                            saveSuccess(attack, enemy, save, x)
                 if enemy.hp <= 0:
                     debug(f"\t\t\t{enemy.name} died!")
                     if enemy.type == "p":
@@ -122,15 +127,26 @@ def attackMiss(atk, enemy, x):
 
 
 def saveFailure(save, attack, enemy, x):
-    x.simStats.attacksHit += 1
-    enemy.simStats.defendsFailed += 1
     damage = roll(attack.damage)
-    enemy.hp = enemy.hp - damage.plain
-    x.simStats.damageDealt += damage.plain
-    enemy.simStats.damageTaken += damage.plain
     debug(f"\t\tRolled a {save.plain}, DC is {attack.dc}")
-    debug(f"\t\t\tFailed Saving Throw! (did {damage.plain} damage)")
+    if not attack.half:
+        debug(f"\t\t\tFailed Saving Throw! (did {damage.plain} damage)")
+        enemy.hp = enemy.hp - damage.plain
+        x.simStats.damageDealt += damage.plain
+        enemy.simStats.damageTaken += damage.plain
+        x.simStats.attacksHit += 1
+        enemy.simStats.defendsFailed += 1
+    else:
+        halved = math.floor((damage.plain/2))
+        debug(f"\t\t\tSucceeded Saving Throw! Only took half damage. (did {halved} damage)")
+        enemy.hp = enemy.hp - halved
+        x.simStats.damageDealt += halved
+        enemy.simStats.damageTaken += halved
+        x.simStats.attacksMiss += 1
+        enemy.simStats.defendsSuccess += 1
+
     debug(f"\t\t\t{enemy.name} has {enemy.hp} HP left.")
+
 
 
 def attackHit(atk, attack, enemy, x):
