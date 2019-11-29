@@ -19,26 +19,44 @@
       {
         "name": "Shortsword",
         "hit": 4,
-        "damage": "1d6+2"
+        "damage": "1d6+2",
+        "type": "MA"
       },
       {
         "name": "Shortbow",
         "hit": 4,
-        "damage": "1d6+2"
+        "damage": "1d6+2",
+        "type": "RA"
+      },
+      {
+        "name": "Viscious Mockery",
+        "dc": 12,
+        "save": "wis",
+        "damage": "1d4",
+        "effect": "target,disadv,1,attack",
+        "type": "RS"
       },
       {
         "name": "Thunderwave",
+        "level": 1,
         "dc": 12,
         "save": "con",
         "half": true,
-        "damage": "2d8"
+        "damage": "2d8",
+        "aoe": 15,
+        "aoeType": "cube",
+        "type": "RS"
       },
       {
         "name": "Shatter",
+        "level": 2,
         "dc": 12,
         "save": "con",
         "half": true,
-        "damage": "3d8"
+        "damage": "3d8",
+        "aoe": 10,
+        "aoeType": "sphere",
+        "type": "RS"
       }
     ],
     "type": "e"

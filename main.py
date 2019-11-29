@@ -3,10 +3,17 @@ import json
 import math
 
 import config
-from utils.dice import roll
 from models.player import Player
-import collections
+from utils.classes.effects import Effect
+from utils.dice import roll
 import random
+
+def debug(text):
+    if debugPrint:
+        print(text)
+
+def line():
+    debug("---------------------------")
 
 def importEnemies():
     file = json.load(open("./simulationfiles/enemies.json", "r"))
@@ -26,12 +33,6 @@ def rollInitiative(enemyList, playerList):
         init = roll(f"1d20+{x.get_mod('dexterityMod')}")
         x.initiative = init.plain
 
-def debug(text):
-    if printing:
-        print(text)
-
-def line():
-    print("---------------------------")
 
 def combat(enemyList, playerList):
     debug("Rolling Initiative...")
@@ -46,6 +47,11 @@ def combat(enemyList, playerList):
     while fight:
         debug(f"Round {i} ({len(contenders)} contenders left):")
         for x in contenders:
+            if len(enemyList) >= 1 and len(playerList) >= 1:
+                debug(f"\t{x.name}:")
+            else:
+                fight = False
+                continue
             for attacks in range(x.noa):
                 x.simStats.attacks += 1
                 if x.type == "p":
@@ -63,28 +69,27 @@ def combat(enemyList, playerList):
                         fight = False
                         continue
                 attack = random.choice(x.attacks)
-                debug(f"\t{x.name} attacking: {enemy.name} with {attack.name}")
-                if attack.hit is not 0:
-                    atk = roll(f"1d20+{attack.hit}")
+                checkAttackType(attack, enemy, x)
+                if attack.hit is not None:
+                    atk = checkForAttackEffect(attack, enemy)
                     if atk.plain >= enemy.ac:
                         attackHit(atk, attack, enemy, x)
                     else:
                         attackMiss(atk, enemy, x)
+                    applyEffect(attack, enemy)
                 else:
-                    if attack.save in enemy.saves:
-                        mod = enemy.get_mod(attack.save) + enemy.prof
-                    else:
-                        mod = enemy.get_mod(attack.save)
+                    mod = getSaveMod(attack, enemy)
                     save = roll(f"1d20+{mod}")
                     if save.plain < attack.dc:
                         saveFailure(save, attack, enemy, x)
+                        applyEffect(attack, enemy)
                     else:
                         if attack.half:
                             saveFailure(save, attack, enemy, x)
                         else:
                             saveSuccess(attack, enemy, save, x)
                 if enemy.hp <= 0:
-                    debug(f"\t\t\t{enemy.name} died!")
+                    debug(f"\t\t\t\t{enemy.name} died!")
                     if enemy.type == "p":
                         playerList.remove(enemy)
                         contenders.remove(enemy)
@@ -99,54 +104,98 @@ def combat(enemyList, playerList):
                         if enemiesAlive == 0:
                             fight = False
                             continue
-        debug("---------------------------")
+        line()
         i = i + 1
-    debug("---------------------------")
+    line()
     if playersAlive == 0:
         debug("Enemies Won!")
-        FightStats(everyone)
+        if stats:
+            FightStats(everyone)
         return 1
     if enemiesAlive == 0:
         debug("Players Won!")
-        FightStats(everyone)
+        if stats:
+            FightStats(everyone)
         return 0
+
+
+def checkAttackType(attack, enemy, x):
+    if attack.type == "MA" or attack.type == "RA":
+        debug(f"\t\t{x.name} attacking {enemy.name} with a {attack.name}")
+    if attack.type == "MS" or attack.type == "RS":
+        debug(f"\t\t{x.name} casting {attack.name}.\n\t\tTarget: {enemy.name}")
+
+
+def getSaveMod(attack, enemy):
+    if attack.save in enemy.saves:
+        mod = enemy.get_mod(attack.save) + enemy.prof
+    else:
+        mod = enemy.get_mod(attack.save)
+    return mod
+
+def processEffect(effect):
+    effect.duration -= 1
+    return effect
+
+def checkForAttackEffect(attack, enemy):
+    if len(enemy.effects) > 0:
+        for f in enemy.effects:
+            if f.what.lower() == "attack":
+                f = processEffect(f)
+                atk = roll(f"1d20+{attack.hit} {f.effect.lower()}")
+                if f.duration == 0:
+                    enemy.effects.remove(f)
+            else:
+                atk = roll(f"1d20+{attack.hit}")
+    else:
+        atk = roll(f"1d20+{attack.hit}")
+    return atk
+
+
+def applyEffect(attack, enemy):
+    if attack.effect is not None:
+        if attack.effect.who == "target":
+            enemy.effects.append(
+                Effect(attack.effect.effect, int(attack.effect.duration), attack.effect.what))
 
 
 def saveSuccess(attack, enemy, save, x):
     x.simStats.attacksMiss += 1
     enemy.simStats.defendsSuccess += 1
-    debug(f"\t\tRolled a {save.plain}, DC is {attack.dc}")
-    debug("\t\t\tSucceeded Saving Throw!")
+    debug(f"\t\t\tRolled {save.plain}, DC is {attack.dc}")
+    debug("\t\t\t\tSucceeded Saving Throw!")
 
 
 def attackMiss(atk, enemy, x):
     x.simStats.attacksMiss += 1
     enemy.simStats.defendsSuccess += 1
-    debug(f"\t\tRolled a {atk.plain}, AC is {enemy.ac}")
-    debug("\t\t\tMiss!")
+    if "disadv" in atk.result:
+        debug(f"\t\t\tRolled {atk.plain} with disadvantage, AC is {enemy.ac}")
+    else:
+        debug(f"\t\t\tRolled {atk.plain}, AC is {enemy.ac}")
+    debug("\t\t\t\tMiss!")
 
 
 def saveFailure(save, attack, enemy, x):
     damage = roll(attack.damage)
-    debug(f"\t\tRolled a {save.plain}, DC is {attack.dc}")
+    debug(f"\t\t\tRolled a {save.plain}, DC is {attack.dc}")
     if not attack.half:
-        debug(f"\t\t\tFailed Saving Throw! (did {damage.plain} damage)")
+        debug(f"\t\t\t\tFailed Saving Throw! (did {damage.plain} damage)")
         enemy.hp = enemy.hp - damage.plain
         x.simStats.damageDealt += damage.plain
         enemy.simStats.damageTaken += damage.plain
         x.simStats.attacksHit += 1
         enemy.simStats.defendsFailed += 1
     else:
-        halved = math.floor((damage.plain/2))
-        debug(f"\t\t\tSucceeded Saving Throw! Only took half damage. (did {halved} damage)")
+        halved = math.floor((damage.plain / 2))
+        debug(f"\t\t\t\tSucceeded Saving Throw! Only took half damage. (did {halved} damage)")
         enemy.hp = enemy.hp - halved
         x.simStats.damageDealt += halved
         enemy.simStats.damageTaken += halved
         x.simStats.attacksMiss += 1
         enemy.simStats.defendsSuccess += 1
 
-    debug(f"\t\t\t{enemy.name} has {enemy.hp} HP left.")
-
+    debug(f"\t\t\t\t{enemy.name} has {enemy.hp} HP left.")
 
 
 def attackHit(atk, attack, enemy, x):
@@ -156,18 +205,21 @@ def attackHit(atk, attack, enemy, x):
     enemy.hp = enemy.hp - damage.plain
     x.simStats.damageDealt += damage.plain
     enemy.simStats.damageTaken += damage.plain
-    debug(f"\t\tRolled a {atk.plain}, AC is {enemy.ac}")
-    debug(f"\t\t\tHit! (did {damage.plain} damage)")
-    debug(f"\t\t\t{enemy.name} has {enemy.hp} HP left.")
+    if "disadv" in atk.result:
+        debug(f"\t\t\tRolled {atk.plain} with disadvantage, AC is {enemy.ac}")
+    else:
+        debug(f"\t\t\tRolled {atk.plain}, AC is {enemy.ac}")
+    debug(f"\t\t\t\tHit! (did {damage.plain} damage)")
+    debug(f"\t\t\t\t{enemy.name} has {enemy.hp} HP left.")
 
 
 def FightStats(everyone):
-    debug("---------------------------")
+    line()
     debug(f"----Overall Statistics----")
     for y in everyone:
         debug(y.name)
         debug(y.simStats.get_stats())
-        debug("---------------------------")
+        line()
 
 
 def run():
@@ -187,7 +239,7 @@ def run():
         elif win == 1:
             enemyWins += 1
             enemySim += 1
-        debug("-------------------------")
+        line()
         if reports != 0:
             if i % reports == 0:
                 print(f"Progress after {reports} fights (total {i}):")
@@ -195,12 +247,23 @@ def run():
                 print(f"\tEnemies won {enemySim} times\n")
                 playerSim = 0
                 enemySim = 0
+    line()
     print(f"End result after {amount} fights:")
-    print(f"\tPlayers won {playerWins} out of {amount} times")
-    print(f"\tEnemies won {enemyWins} out of {amount} times")
+    print(f"\tPlayers won {playerWins} times ({calcPercentage(playerWins, amount)}%)")
+    print(f"\tEnemies won {enemyWins} times ({calcPercentage(enemyWins, amount)}%)")
+
 
 amount = config.amount
 reports = config.reports
-printing = config.debug
+debugPrint = config.debug
+stats = config.stats
+
+def calcPercentage(x, y):
+    if not x and not y:
+       return None
+    elif x < 0 or y < 0:
+       return None
+    else:
+       return 100 * float(x)/float(y)
 
 run()

@@ -1,7 +1,10 @@
 import logging
-log = logging.getLogger(__name__)
 
-from utils.functions import AbilityScores, Attacks, SimStats
+from utils.classes.abilityScores import AbilityScores
+from utils.classes.attacks import Attacks
+from utils.classes.simStats import SimStats
+
+log = logging.getLogger(__name__)
 
 class Player:
     def __init__(self, name: str, ac: int, hp: int, ability_scores: AbilityScores, type: str, prof: int, noa: int, attacks: Attacks, simStats: SimStats, saves):
@@ -20,6 +23,7 @@ class Player:
         self.type = type
         self.simStats = simStats
         self.saves = saves
+        self.effects = []
         self.initiative = 0
 
     @classmethod

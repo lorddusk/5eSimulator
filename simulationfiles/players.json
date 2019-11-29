@@ -19,12 +19,14 @@
       {
         "name": "Longsword",
         "hit": 5,
-        "damage": "1d8+3"
+        "damage": "1d8+3",
+        "type": "MA"
       },
       {
         "name": "Hand Axe",
         "hit": 5,
-        "damage": "1d6+3"
+        "damage": "1d6+3",
+        "type": "MA"
       }
     ],
     "type": "p"
@@ -49,12 +51,14 @@
       {
         "name": "Short Sword",
         "hit": 4,
-        "damage": "1d6+2"
+        "damage": "1d6+2",
+        "type": "MA"
       },
       {
         "name": "Fire Bolt",
         "hit": 5,
-        "damage": "1d10"
+        "damage": "1d10",
+        "type": "RS"
       }
     ],
     "type": "p"
@@ -79,14 +83,16 @@
       {
         "name": "Mace",
         "hit": 1,
-        "damage": "1d6-1"
+        "damage": "1d6-1",
+        "type": "MA"
       },
       {
         "name": "Sacred Flame",
         "dc": 13,
         "save": "dex",
-        "half": true,
-        "damage": "1d8"
+        "half": false,
+        "damage": "1d8",
+        "type": "RS"
       }
     ],
     "type": "p"
@@ -111,12 +117,14 @@
       {
         "name": "Short Sword",
         "hit": 5,
-        "damage": "1d6+3"
+        "damage": "1d6+3",
+        "type": "MA"
       },
       {
         "name": "Shortbow",
         "hit": 5,
-        "damage": "1d6+3"
+        "damage": "1d6+3",
+        "type": "RA"
       }
     ],
     "type": "p"
