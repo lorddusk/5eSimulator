@@ -4,7 +4,6 @@ import math
 
 import config
 from utils.classes.effects import Effect
-from utils.debug import FightStats, checkAttackType
 from utils.dice import roll
 from utils.importer import importEnemies, importPlayers
 
@@ -17,6 +16,11 @@ def debug(text):
 def line():
     debug("---------------------------")
 
+def checkAttackType(attack, enemy, x):
+    if attack.type == "MA" or attack.type == "RA":
+        debug(f"\t\t{x.name} attacking {enemy.name} with a {attack.name}")
+    if attack.type == "MS" or attack.type == "RS":
+        debug(f"\t\t{x.name} casting {attack.name}.\n\t\tTarget: {enemy.name}")
 
 def rollInitiative(enemyList, playerList):
     for x in playerList:
@@ -117,7 +121,6 @@ def selectAndExecute(enemy, x):
                 checkAttackType(attack, enemy, x)
                 executeAttack(attack, enemy, x)
                 spells.slots -= 1
-                print(f"{spells.slots} Spell Slots remaining.")
 
 
 def executeAttack(attack, enemy, x):
@@ -266,6 +269,11 @@ reports = config.reports
 debugPrint = config.debug
 stats = config.stats
 
+def FightStats(everyone):
+    debug(f"----Overall Statistics----")
+    for y in everyone:
+        debug(y.name)
+        debug(y.simStats.get_stats())
 
 def calcPercentage(x, y):
     if not x and not y:
