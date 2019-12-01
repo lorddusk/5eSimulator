@@ -1,28 +1,21 @@
-import json
+import random
 
 import math
 
 import config
-from models.player import Player
 from utils.classes.effects import Effect
+from utils.debug import FightStats, checkAttackType
 from utils.dice import roll
-import random
+from utils.importer import importEnemies, importPlayers
+
 
 def debug(text):
     if debugPrint:
         print(text)
 
+
 def line():
     debug("---------------------------")
-
-def importEnemies():
-    file = json.load(open("./simulationfiles/enemies.json", "r"))
-    return [Player.from_data(r) for r in file]
-
-
-def importPlayers():
-    file = json.load(open("./simulationfiles/players.json", "r"))
-    return [Player.from_data(r) for r in file]
 
 
 def rollInitiative(enemyList, playerList):
@@ -68,26 +61,7 @@ def combat(enemyList, playerList):
                     else:
                         fight = False
                         continue
-                attack = random.choice(x.attacks)
-                checkAttackType(attack, enemy, x)
-                if attack.hit is not None:
-                    atk = checkForAttackEffect(attack, enemy)
-                    if atk.plain >= enemy.ac:
-                        attackHit(atk, attack, enemy, x)
-                    else:
-                        attackMiss(atk, enemy, x)
-                    applyEffect(attack, enemy)
-                else:
-                    mod = getSaveMod(attack, enemy)
-                    save = roll(f"1d20+{mod}")
-                    if save.plain < attack.dc:
-                        saveFailure(save, attack, enemy, x)
-                        applyEffect(attack, enemy)
-                    else:
-                        if attack.half:
-                            saveFailure(save, attack, enemy, x)
-                        else:
-                            saveSuccess(attack, enemy, save, x)
+                selectAndExecute(enemy, x)
                 if enemy.hp <= 0:
                     debug(f"\t\t\t\t{enemy.name} died!")
                     if enemy.type == "p":
@@ -119,11 +93,52 @@ def combat(enemyList, playerList):
         return 0
 
 
-def checkAttackType(attack, enemy, x):
-    if attack.type == "MA" or attack.type == "RA":
-        debug(f"\t\t{x.name} attacking {enemy.name} with a {attack.name}")
-    if attack.type == "MS" or attack.type == "RS":
-        debug(f"\t\t{x.name} casting {attack.name}.\n\t\tTarget: {enemy.name}")
+def selectAndExecute(enemy, x):
+    if x.spells is not None:
+        atsp = random.randint(1, 2)
+    else:
+        atsp = 1
+    if atsp == 1:
+        attack = random.choice(x.attacks)
+        checkAttackType(attack, enemy, x)
+        executeAttack(attack, enemy, x)
+    elif atsp == 2:
+        spells = random.choice(x.spells)
+        slots = spells.slots
+        if slots is None and not 0:
+            attack = random.choice(spells.spells)
+            checkAttackType(attack, enemy, x)
+            executeAttack(attack, enemy, x)
+        else:
+            if spells.slots == 0:
+                selectAndExecute(enemy, x)
+            else:
+                attack = random.choice(spells.spells)
+                checkAttackType(attack, enemy, x)
+                executeAttack(attack, enemy, x)
+                spells.slots -= 1
+                print(f"{spells.slots} Spell Slots remaining.")
+
+
+def executeAttack(attack, enemy, x):
+    if attack.hit is not None:
+        atk = checkForAttackEffect(attack, enemy)
+        if atk.plain >= enemy.ac:
+            attackHit(atk, attack, enemy, x)
+        else:
+            attackMiss(atk, enemy, x)
+        applyEffect(attack, enemy)
+    else:
+        mod = getSaveMod(attack, enemy)
+        save = roll(f"1d20+{mod}")
+        if save.plain < attack.dc:
+            saveFailure(save, attack, enemy, x)
+            applyEffect(attack, enemy)
+        else:
+            if attack.half:
+                saveFailure(save, attack, enemy, x)
+            else:
+                saveSuccess(attack, enemy, save, x)
 
 
 def getSaveMod(attack, enemy):
@@ -133,9 +148,11 @@ def getSaveMod(attack, enemy):
         mod = enemy.get_mod(attack.save)
     return mod
 
+
 def processEffect(effect):
     effect.duration -= 1
     return effect
+
 
 def checkForAttackEffect(attack, enemy):
     if len(enemy.effects) > 0:
@@ -152,17 +169,10 @@ def checkForAttackEffect(attack, enemy):
     return atk
 
 
-def applyEffect(attack, enemy):
-    if attack.effect is not None:
-        if attack.effect.who == "target":
-            enemy.effects.append(
-                Effect(attack.effect.effect, int(attack.effect.duration), attack.effect.what))
-
-
 def saveSuccess(attack, enemy, save, x):
     x.simStats.attacksMiss += 1
     enemy.simStats.defendsSuccess += 1
-    debug(f"\t\t\tRolled {save.plain}, DC is {attack.dc}")
+    debug(f"\t\t\t{enemy.name} rolled {save.plain}, DC is {attack.dc}")
     debug("\t\t\t\tSucceeded Saving Throw!")
 
 
@@ -213,13 +223,11 @@ def attackHit(atk, attack, enemy, x):
     debug(f"\t\t\t\t{enemy.name} has {enemy.hp} HP left.")
 
 
-def FightStats(everyone):
-    line()
-    debug(f"----Overall Statistics----")
-    for y in everyone:
-        debug(y.name)
-        debug(y.simStats.get_stats())
-        line()
+def applyEffect(attack, enemy):
+    if attack.effect is not None:
+        if attack.effect.who == "target":
+            enemy.effects.append(
+                Effect(attack.effect.effect, int(attack.effect.duration), attack.effect.what))
 
 
 def run():
@@ -258,12 +266,14 @@ reports = config.reports
 debugPrint = config.debug
 stats = config.stats
 
+
 def calcPercentage(x, y):
     if not x and not y:
-       return None
+        return None
     elif x < 0 or y < 0:
-       return None
+        return None
     else:
-       return 100 * float(x)/float(y)
+        return 100 * float(x) / float(y)
+
 
 run()

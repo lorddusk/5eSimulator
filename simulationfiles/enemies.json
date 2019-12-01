@@ -27,36 +27,55 @@
         "hit": 4,
         "damage": "1d6+2",
         "type": "RA"
-      },
+      }
+    ],
+    "spells": [
       {
-        "name": "Viscious Mockery",
-        "dc": 12,
-        "save": "wis",
-        "damage": "1d4",
-        "effect": "target,disadv,1,attack",
-        "type": "RS"
-      },
-      {
-        "name": "Thunderwave",
-        "level": 1,
-        "dc": 12,
-        "save": "con",
-        "half": true,
-        "damage": "2d8",
-        "aoe": 15,
-        "aoeType": "cube",
-        "type": "RS"
-      },
-      {
-        "name": "Shatter",
-        "level": 2,
-        "dc": 12,
-        "save": "con",
-        "half": true,
-        "damage": "3d8",
-        "aoe": 10,
-        "aoeType": "sphere",
-        "type": "RS"
+        "0": {
+          "spells": [
+            {
+              "name": "Viscious Mockery",
+              "level": 0,
+              "dc": 12,
+              "save": "wis",
+              "damage": "1d4",
+              "effect": "target,disadv,1,attack",
+              "type": "RS"
+            }
+          ]
+        },
+        "1": {
+          "slots": 4,
+          "spells": [
+            {
+              "name": "Thunderwave",
+              "level": 1,
+              "dc": 12,
+              "save": "con",
+              "half": true,
+              "damage": "2d8",
+              "aoe": 15,
+              "aoeType": "cube",
+              "type": "RS"
+            }
+          ]
+        },
+        "2": {
+          "slots": 3,
+          "spells": [
+            {
+              "name": "Shatter",
+              "level": 2,
+              "dc": 12,
+              "save": "con",
+              "half": true,
+              "damage": "3d8",
+              "aoe": 10,
+              "aoeType": "sphere",
+              "type": "RS"
+            }
+          ]
+        }
       }
     ],
     "type": "e"

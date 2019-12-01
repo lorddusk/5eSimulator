@@ -3,11 +3,14 @@ import logging
 from utils.classes.abilityScores import AbilityScores
 from utils.classes.attacks import Attacks
 from utils.classes.simStats import SimStats
+from utils.classes.spells import Spells, SpellLevel, Spell
 
 log = logging.getLogger(__name__)
 
+
 class Player:
-    def __init__(self, name: str, ac: int, hp: int, ability_scores: AbilityScores, type: str, prof: int, noa: int, attacks: Attacks, simStats: SimStats, saves):
+    def __init__(self, name: str, ac: int, hp: int, ability_scores: AbilityScores, type: str, prof: int, noa: int,
+                 attacks: Attacks, simStats: SimStats, saves, spells: Spells):
         self.name = name
         self.hp = hp
         self.ac = ac
@@ -25,6 +28,7 @@ class Player:
         self.saves = saves
         self.effects = []
         self.initiative = 0
+        self.spells = spells
 
     @classmethod
     def from_data(cls, data):
@@ -41,7 +45,8 @@ class Player:
             except Exception as e:
                 log.error(e)
         try:
-            scores = AbilityScores(data['name'], data['str'] or 10, data['dex'] or 10, data['con'] or 10, data['int'] or 10,
+            scores = AbilityScores(data['name'], data['str'] or 10, data['dex'] or 10, data['con'] or 10,
+                                   data['int'] or 10,
                                    data['wis'] or 10, data['cha'] or 10)
         except Exception as e:
             log.error(e)
@@ -51,8 +56,22 @@ class Player:
                 saves.append(save)
             except Exception as e:
                 log.error(e)
+        spells = None
+        if data.get('spells') is not None:
+            spells = []
+            for level in data['spells']:
+                for x in level:
+                    if level[f'{x}'].get('slots') is not None:
+                        slots = level[f'{x}'].get('slots')
+                    else:
+                        slots = None
+                    actualSpells = []
+                    for spell in level[f'{x}']['spells']:
+                        actualSpells.append(Spell(spell))
+                    spellLevel = SpellLevel(slots, actualSpells)
+                    spells.append(spellLevel)
 
-        return cls(data['name'], ac, hp, scores, type, prof, noa, attacks, SimStats(), saves)
+        return cls(data['name'], ac, hp, scores, type, prof, noa, attacks, SimStats(), saves, spells)
 
     def get_stat_array(self):
         """

@@ -53,12 +53,20 @@
         "hit": 4,
         "damage": "1d6+2",
         "type": "MA"
-      },
+      }
+    ],
+    "spells": [
       {
-        "name": "Fire Bolt",
-        "hit": 5,
-        "damage": "1d10",
-        "type": "RS"
+        "0": {
+          "spells": [
+            {
+              "name": "Fire Bolt",
+              "hit": 5,
+              "damage": "1d10",
+              "type": "RS"
+            }
+          ]
+        }
       }
     ],
     "type": "p"
@@ -85,14 +93,22 @@
         "hit": 1,
         "damage": "1d6-1",
         "type": "MA"
-      },
+      }
+    ],
+    "spells": [
       {
-        "name": "Sacred Flame",
-        "dc": 13,
-        "save": "dex",
-        "half": false,
-        "damage": "1d8",
-        "type": "RS"
+        "0": {
+          "spells": [
+            {
+              "name": "Sacred Flame",
+              "dc": 13,
+              "save": "dex",
+              "half": false,
+              "damage": "1d8",
+              "type": "RS"
+            }
+          ]
+        }
       }
     ],
     "type": "p"
